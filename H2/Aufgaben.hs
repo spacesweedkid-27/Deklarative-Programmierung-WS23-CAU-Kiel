@@ -81,3 +81,34 @@ getValue hand
 -- ET -> empty tree, FT -> full tree
 data SearchTree = ET | FT SearchTree Int SearchTree
  deriving (Show, Eq)
+
+-- If a tree is empty then just set the value and append two empty trees
+-- Ff not then decide and append to the left or right subtree
+insert :: Int -> SearchTree -> SearchTree
+-- this looks so cursed
+insert num ET = FT ET num ET
+insert num (FT left val right)
+    | num < val = FT (insert num left) val right
+    | otherwise = FT left val (insert num right)
+
+-- represents (1(2)(3(4)6))
+exTree1 :: SearchTree
+exTree1 = FT (FT ET 1 ET) 2 (FT (FT ET 3 ET) 4 (FT ET 6 ET))
+
+-- 2.2
+-- The empty tree should always return False since there is nothing in it
+-- If found return True
+-- If not found then search left and then (that's how at least || works in other languages I know) right
+isElem :: Int -> SearchTree -> Bool
+isElem num ET = False
+isElem num (FT left val right)
+    | val == num = True
+    | otherwise = isElem num left || isElem num right
+
+-- 2.3
+delete :: Int -> SearchTree -> SearchTree
+-- I know there is a more efficiant implementation with O(log_2 n), but to spare me some time, I will use the easy way out with O(n)
+delete num ET = ET
+-- delete (FT left val right) num
+    -- |
+    
