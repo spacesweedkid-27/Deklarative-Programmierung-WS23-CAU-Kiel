@@ -106,9 +106,33 @@ isElem num (FT left val right)
     | otherwise = isElem num left || isElem num right
 
 -- 2.3
+-- calculates the minimum of a tree
+-- aka the most left node
+minT :: SearchTree -> Int
+-- if left is empty then return val
+minT (FT ET val right) = val
+-- if not search left
+minT (FT left val right) = minT left
+
+-- removes minimum of a tree
+deleteMin :: SearchTree -> SearchTree
+deleteMin (FT ET val right) = right
+deleteMin (FT (FT leftleft leftval leftright) val right)
+    -- if the value of the left subtree is the minimum, then delete the branch
+    | leftval == minT (FT (FT leftleft leftval leftright) val right) = FT ET val right
+    -- else search left
+    | otherwise = FT (deleteMin (FT leftleft leftval leftright)) val right
+
+-- deletes the root of a (sub-) tree
+deleteRoot :: SearchTree -> SearchTree
+deleteRoot (FT ET val right) = right
+deleteRoot (FT left val ET) = left
+deleteRoot (FT left val right) = FT left (minT right) (deleteMin right)
+
 delete :: Int -> SearchTree -> SearchTree
--- I know there is a more efficiant implementation with O(log_2 n), but to spare me some time, I will use the easy way out with O(n)
 delete num ET = ET
--- delete (FT left val right) num
-    -- |
-    
+delete num (FT left val right)
+    | val == num = deleteRoot (FT left val right)
+    | val > num = FT (delete num left) val right
+    | val < num = FT left val (delete num right)
+    | otherwise = FT left val right -- Return the normal tree if something went wrong (which won't)
