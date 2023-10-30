@@ -1,5 +1,5 @@
 -- 0.1
-data Rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King | Ace
+data Rank = Num Int | Jack | Queen | King | Ace
  deriving (Show, Eq)
 
 data Suit = Heart | Diamond | Club | Spade
@@ -10,16 +10,10 @@ data Card = Card Rank Suit
 
 -- 0.2
 getCardValue :: Card -> Int
-getCardValue (Card Two suit) = 2
-getCardValue (Card Three suit) = 3
-getCardValue (Card Four suit) = 4
-getCardValue (Card Five suit) = 5
-getCardValue (Card Six suit) = 6
-getCardValue (Card Seven suit) = 7
-getCardValue (Card Eight suit) = 8
-getCardValue (Card Nine suit) = 9
+getCardValue (Card (Num number) suit)
+    | 2 <= number && number <= 10 = number
+    | otherwise = undefined
 getCardValue (Card Ace suit) = 11
--- Other values are automatically 10 because there is only Ten, Jack, Queen and King left
 getCardValue (Card rank suit) = 10
 
 -- 0.3
@@ -35,10 +29,10 @@ data Hand = Nil | Const Card Hand
 
 example1 :: Hand
 -- wow this language can't be read at all
-example1 = Const (Card Two Heart) (Const (Card Three Club) Nil)
+example1 = Const (Card (Num 2) Heart) (Const (Card (Num 3) Club) Nil)
 
 example2 :: Hand
-example2 = Const (Card Ace Heart) (Const (Card Ace Club) Nil)
+example2 = Const (Card Ace Heart) (Const (Card (Num 10) Club) Nil)
 
 -- 1.1
 -- isInHand :: Hand -> Card -> Bool
@@ -49,8 +43,13 @@ example2 = Const (Card Ace Heart) (Const (Card Ace Club) Nil)
 
 -- returns a Hand with every card having one type
 getAllFromType :: Suit -> Hand
--- I am ashamed
-getAllFromType suit = Const (Card Two suit) (Const (Card Three suit) (Const (Card Four suit) (Const (Card Five suit) (Const (Card Six suit) (Const (Card Seven suit) (Const (Card Eight suit) (Const (Card Nine suit) (Const (Card Ten suit) (Const (Card Jack suit) (Const (Card Queen suit) (Const (Card King suit) (Const (Card Ace suit) Nil))))))))))))
+-- Hand with literate types and "manually appended" all numeric cards.
+getAllFromType suit = Const (Card Jack suit) (Const (Card Queen suit) (Const (Card King suit) (Const (Card Ace suit) (helper 10))))
+    where
+        -- Should recursively iterate from number 10 to 2
+        helper :: Int -> Hand
+        helper 1 = Nil
+        helper num = Const (Card (Num num) suit) (helper (num-1))
 
 fullDeck :: Hand
 fullDeck = getAllFromType Heart <+> getAllFromType Diamond <+> getAllFromType Club <+> getAllFromType Spade
