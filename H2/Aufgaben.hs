@@ -76,6 +76,7 @@ getValue hand
     | getmaxValue hand > 21 = getminValue hand
     | otherwise = getmaxValue hand
 
+-- TASK 2 IS READY TO BE SERVED
 -- 2.1
 -- ET -> empty tree, FT -> full tree
 data SearchTree = ET | FT SearchTree Int SearchTree
@@ -89,10 +90,6 @@ insert num ET = FT ET num ET
 insert num (FT left val right)
     | num < val = FT (insert num left) val right
     | otherwise = FT left val (insert num right)
-
--- represents (1(2)(3(4)6))
-exTree1 :: SearchTree
-exTree1 = FT (FT ET 1 ET) 2 (FT (FT ET 3 ET) 4 (FT ET 6 ET))
 
 -- 2.2
 -- The empty tree should always return False since there is nothing in it
@@ -108,6 +105,8 @@ isElem num (FT left val right)
 -- calculates the minimum of a tree
 -- aka the most left node
 minT :: SearchTree -> Int
+-- if empty then return undefined thank you prechecker for at least giving me warnings. I wish I could display them in vscode somehow
+minT ET = undefined
 -- if left is empty then return val
 minT (FT ET val right) = val
 -- if not search left
@@ -115,6 +114,8 @@ minT (FT left val right) = minT left
 
 -- removes minimum of a tree
 deleteMin :: SearchTree -> SearchTree
+-- same issue
+deleteMin ET = ET
 deleteMin (FT ET val right) = right
 deleteMin (FT (FT leftleft leftval leftright) val right)
     -- if the value of the left subtree is the minimum, then delete the branch
@@ -124,6 +125,8 @@ deleteMin (FT (FT leftleft leftval leftright) val right)
 
 -- deletes the root of a (sub-) tree
 deleteRoot :: SearchTree -> SearchTree
+-- same issue
+deleteRoot ET = ET
 deleteRoot (FT ET val right) = right
 deleteRoot (FT left val ET) = left
 deleteRoot (FT left val right) = FT left (minT right) (deleteMin right)
@@ -135,3 +138,7 @@ delete num (FT left val right)
     | val > num = FT (delete num left) val right
     | val < num = FT left val (delete num right)
     | otherwise = FT left val right -- Return the normal tree if something went wrong (which won't)
+
+-- 3.1
+-- same definition as in the searchtree
+data Tree = E | F Tree Int Tree
