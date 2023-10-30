@@ -194,7 +194,7 @@ reverse2 a = fst (revAkk [] a)
         -- maps (temp), (todo) -> (nextTemp, nextTodo)
         revAkk :: [a] -> [a] -> ([a], [a])
         revAkk temp [] = (temp, [])
-        revAkk temp (a : restTodo) = revAkk (a : temp) restTodo
+        revAkk temp (a2 : restTodo) = revAkk (a2 : temp) restTodo
 
 -- 4.2
 -- uses recursive iteration with recSearch
@@ -204,9 +204,9 @@ indexOf key [] = Nothing
 indexOf key list = recSearch key list 0
     where
         recSearch :: Int -> [Int] -> Int -> Maybe Int
-        recSearch key [] num = Nothing
-        recSearch key (currElem : restList) num
-            | key == currElem = Just num
+        recSearch key2 [] num = Nothing
+        recSearch key2 (currElem : restList) num
+            | key2 == currElem = Just num
             | otherwise = recSearch key restList (num + 1)
 
 -- 4.3
@@ -223,7 +223,7 @@ inits (currElem : restList) = helper (reverse2 (currElem : restList))
     where
         helper :: [a] -> [[a]]
         helper [] = [[]]
-        helper (currElem : restList) = helper restList ++ [restList ++ [currElem]]
+        helper (currElem2 : restList2) = helper restList2 ++ [restList2 ++ [currElem2]]
 
 -- 4.4
 -- inserts an element into a defined position in a list
@@ -231,17 +231,18 @@ insertInAt :: a -> [a] -> Int -> [a]
 insertInAt element list 0 = element : list
 -- good luck reading that
 insertInAt element (current : nextList) index = current : insertInAt element nextList (index - 1)
+insertInAt element list index = undefined
 
 -- iterates between all indexes in a list and executes insertInAt for each of them
 insert :: a -> [a] -> [[a]]
 insert val list = recu val list 0
     where
         recu :: a -> [a] -> Int -> [[a]]
-        recu elem [] num = []
-        recu elem list num
+        recu elem2 [] num = []
+        recu elem2 list2 num
             -- you need to stop one value after the length since the result will have |M| + 1 insertions.
-            | num == (length list + 1) = []
-            | otherwise = insertInAt elem list num : recu elem list (num + 1)
+            | num == (length list2 + 1) = []
+            | otherwise = insertInAt elem2 list2 num : recu elem2 list2 (num + 1)
 
 -- 4.5
 -- perms :: [a] -> [[a]]
