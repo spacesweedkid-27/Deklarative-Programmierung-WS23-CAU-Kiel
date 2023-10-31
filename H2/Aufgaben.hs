@@ -1,38 +1,34 @@
 -- 0.1
-data Rank = Num Int | Jack | Queen | King | Ace
+data Rank = Numeric Int | Jack | Queen | King | Ace
  deriving (Show, Eq)
 
-data Suit = Heart | Diamond | Club | Spade
+data Suit = Hearts | Diamonds | Clubs | Spades
  deriving (Show, Eq)
 
-data Card = Card Rank Suit
+data Card = Card Suit Rank
  deriving (Show, Eq)
 
 -- 0.2
 getCardValue :: Card -> Int
-getCardValue (Card (Num number) suit)
+getCardValue (Card suit (Numeric number))
     | 2 <= number && number <= 10 = number
     | otherwise = undefined
-getCardValue (Card Ace suit) = 11
-getCardValue (Card rank suit) = 10
+getCardValue (Card suit Ace) = 11
+getCardValue (Card suit rank) = 10
 
 -- 0.3
--- Define Hand as linked list
--- this is a complete nightmare
-data Hand = Nil | Const Card Hand
- deriving (Show, Eq)
+-- Define Hand as a list (note: type is an alias like typedef in C)
+type Hand = [Card]
 
 (<+>) :: Hand -> Hand -> Hand
-(<+>) Nil hand = hand
-(<+>) hand Nil = hand
-(<+>) (Const card1 hand1) hand2 = Const card1 ((<+>) hand1 hand2)
+(<+>) hand1 hand2 = hand1 ++ hand2
 
-example1 :: Hand
+-- example1 :: Hand
 -- wow this language can't be read at all
-example1 = Const (Card (Num 2) Heart) (Const (Card (Num 3) Club) Nil)
+-- example1 = Const (Card (Numeric 2) Heart) (Const (Card (Numeric 3) Club) Nil)
 
-example2 :: Hand
-example2 = Const (Card Ace Heart) (Const (Card (Num 10) Club) Nil)
+-- example2 :: Hand
+-- example2 = Const (Card Ace Heart) (Const (Card (Numeric 10) Club) Nil)
 
 -- 1.1
 -- isInHand :: Hand -> Card -> Bool
@@ -44,27 +40,27 @@ example2 = Const (Card Ace Heart) (Const (Card (Num 10) Club) Nil)
 -- returns a Hand with every card having one type
 getAllFromType :: Suit -> Hand
 -- Hand with literate types and "manually appended" all numeric cards.
-getAllFromType suit = Const (Card Jack suit) (Const (Card Queen suit) (Const (Card King suit) (Const (Card Ace suit) (helper 10))))
+getAllFromType suit = Card suit Jack : (Card suit Queen : (Card suit King : (Card suit Ace : helper 10)))
     where
         -- Should recursively iterate from number 10 to 2
         helper :: Int -> Hand
-        helper 1 = Nil
-        helper num = Const (Card (Num num) suit) (helper (num-1))
+        helper 1 = []
+        helper num = Card suit (Numeric num) : helper (num-1)
 
 fullDeck :: Hand
-fullDeck = getAllFromType Heart <+> getAllFromType Diamond <+> getAllFromType Club <+> getAllFromType Spade
+fullDeck = getAllFromType Hearts <+> getAllFromType Diamonds <+> getAllFromType Clubs <+> getAllFromType Spades
 
 -- 1.2
 numOfAces :: Hand -> Int
-numOfAces Nil = 0
-numOfAces (Const (Card rank suit) nextHand)
+numOfAces [] = 0
+numOfAces ((Card suit rank) : nextHand)
     | rank == Ace = 1 + numOfAces nextHand
     | otherwise = numOfAces nextHand
 
 -- 1.3
 getmaxValue :: Hand -> Int
-getmaxValue Nil = 0
-getmaxValue (Const card nextHand) = getCardValue card + getmaxValue nextHand
+getmaxValue [] = 0
+getmaxValue (card : nextHand) = getCardValue card + getmaxValue nextHand
 
 getminValue :: Hand -> Int
 -- get the biggest possible value and then change 11 points to 1 point per ace
