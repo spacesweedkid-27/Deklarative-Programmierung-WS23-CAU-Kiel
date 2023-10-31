@@ -30,6 +30,8 @@ type Hand = [Card]
 -- example2 :: Hand
 -- example2 = Const (Card Ace Heart) (Const (Card (Numeric 10) Club) Nil)
 
+-- TASK 1 IS READY TO BE SERVED
+
 -- 1.1
 -- isInHand :: Hand -> Card -> Bool
 -- isInHand Nil card = False -- basically if the last hand is the empty hand then return false
@@ -128,6 +130,8 @@ deleteRoot (FT ET val right) = right
 deleteRoot (FT left val ET) = left
 deleteRoot (FT left val right) = FT left (minT right) (deleteMin right)
 
+-- uncomment
+{-
 delete :: Int -> SearchTree -> SearchTree
 delete num ET = ET
 delete num (FT left val right)
@@ -135,7 +139,7 @@ delete num (FT left val right)
     | val > num = FT (delete num left) val right
     | val < num = FT left val (delete num right)
     | otherwise = FT left val right -- Return the normal tree if something went wrong (which won't)
-
+-}
 
 -- TASK 3 IS READY TO BE SERVED
 -- 3.0
@@ -193,17 +197,18 @@ reverse2 a = fst (revAkk [] a)
         revAkk temp (a2 : restTodo) = revAkk (a2 : temp) restTodo
 
 -- 4.2
+
+-- Had to move it out from indexOf bc the compiler thought that the inner and outer method types could be different
+recSearch :: Eq a => a -> [a] -> Int -> Maybe Int
+recSearch key [] num = Nothing
+recSearch key (currElem : restList) num
+    | key == currElem = Just num
+    | otherwise = recSearch key restList (num + 1)
+
 -- uses recursive iteration with recSearch
--- can't be polymorphic, because the existance of Eq is not guaranteed
-indexOf :: Int -> [Int] -> Maybe Int
+indexOf :: Eq a => a -> [a] -> Maybe Int
 indexOf key [] = Nothing
 indexOf key list = recSearch key list 0
-    where
-        recSearch :: Int -> [Int] -> Int -> Maybe Int
-        recSearch key2 [] num = Nothing
-        recSearch key2 (currElem : restList) num
-            | key2 == currElem = Just num
-            | otherwise = recSearch key restList (num + 1)
 
 -- 4.3
 -- Straightforward
@@ -240,10 +245,72 @@ insert val list = recu val list 0
             | num == (length list2 + 1) = []
             | otherwise = insertInAt elem2 list2 num : recu elem2 list2 (num + 1)
 
+{-
 -- 4.5
--- perms :: [a] -> [[a]]
--- perms [] = [[]]
--- perms (elem: list) = insert elem list ++ insert elem (reverse2 list)
+perms :: [a] -> [[a]]
+perms [] = [[]]
+perms (elem: (nextelem : nextlist)) = insert elem (nextelem : nextlist) ++ appendToEach nextelem (perms (nextlist ++ [elem]))
+-- Case there is no second next element
+perms (elem: list) = insert elem list
+-}
+
+-- generate tuple:
+-- start have len(alphabet) words ✔
+
+-- for each element in alphabet:
+-- add element to tuple ✔
+-- copy all tuples len(alphabet) ✔
+-- repeat
+
+startTuple :: [a] -> [[a]]
+startTuple [] = [[]]
+startTuple [elem] = [[elem]]
+startTuple (elem : nextList) = [elem] : startTuple nextList
+
+appendToEach :: a -> [[a]] -> [[a]]
+appendToEach something [[]] = [[something]]
+appendToEach something [] = []
+appendToEach something [[elem]] = [elem : [something]]
+appendToEach something (currentList : restListList) = (currentList ++ [something]) : appendToEach something restListList
+
+copyTuples :: [[a]] -> Int -> [[a]]
+copyTuples [[]] _ = [[]]
+copyTuples _ 0 = [[]]
+copyTuples [elem] 1 = [elem]
+copyTuples [elem] n = elem : copyTuples [elem] (n-1)
+-- wow double induction
+copyTuples (currentList : nextListofLists) n = copyTuples [currentList] n ++ copyTuples nextListofLists n
+
+-- temp, elem, length, output
+calculateNextStep :: [[a]] -> a -> Int -> [[a]]
+-- first append the element and then multiply the amount of elements by the amount of next possible keys (which is always len(alphabet))
+calculateNextStep list elem num = copyTuples (appendToEach elem list) num
+
+-- input list, length of that, counter, temp, output
+recTuple :: [a] -> Int -> Int -> [[a]] -> [[a]]
+recTuple (elem : restList) len counter temp
+    | len == counter = temp
+    | otherwise = calculateNextStep (recTuple (restList) len (counter+1) temp) elem len
+
+tuple :: [a] -> [[a]]
+tuple [] = [[]]
+tuple (elem : nextList)
+    | null nextList = []
+    | otherwise = [[]]
+
+{-
+-- 
+removeFirstOccurance :: Eq a => a -> [a] -> [a]
+removeFirstOccurance _ [] = []
+removeFirstOccurance key (elem: list)
+    | key == elem = [elem]
+    | otherwise = elem : removeFirstOccurance elem list
+
+-- we have to assume a has operator Eq
+perms :: Eq a => [a] -> [[a]]
+perms [] = [[]]
+perms xs = [ i:j | i <- xs, j <- perms $ removeFirstOccurance i xs ]
+-}
 
 -- subsets :: [a] -> [[a]]
 -- subsets [] = [[]]
