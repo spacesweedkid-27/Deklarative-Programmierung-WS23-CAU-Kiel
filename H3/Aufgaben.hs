@@ -91,8 +91,8 @@ ex4 = extendTree Leaf (Branch (Branch (Leaf 3) (Leaf 2)) (Leaf 1)) == Branch (Br
 -- could have left it as is, but in case they test with other datatypes and check
 -- for compiler error I didn't wanna risk it
 
-reverse1 :: [Int] -> [Int]
-reverse1 l = rev l []
+reverse :: [Int] -> [Int]
+reverse l = rev l []
     where
         rev []     acc = acc
         rev (x:xs) acc = rev xs (x:acc)
@@ -162,7 +162,7 @@ prop_elemAtReturnedIndex x xs =
 -- reverse
 -- returned list must be exactly as long as the given list
 prop_revSameLength :: [Int] -> Bool
-prop_revSameLength xs = length (reverse1 xs) == length xs
+prop_revSameLength xs = length (reverse xs) == length xs
 
 -- insert
 -- result list contains given element
