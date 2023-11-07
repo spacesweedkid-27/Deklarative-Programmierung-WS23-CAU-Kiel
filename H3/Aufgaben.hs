@@ -3,6 +3,7 @@ import Text.XHtml (base, background, name)
 
 -- 1.1
 -- define data type JSON
+-- don't include in submission
 data JSON = JNull
           | JBool Bool
           | JInt Int
@@ -52,3 +53,36 @@ j = JArray [
     ]
 
 -- A2
+data Tree a = Leaf a | Branch (Tree a) (Tree a)
+    deriving (Show, Eq)
+
+-- flatTree flattens a tree of trees to a tree of elements
+flatTree :: Tree (Tree a) -> Tree a
+flatTree (Leaf t) = t
+flatTree (Branch left right) = Branch (flatTree left) (flatTree right)
+
+-- mapTree applies function to each element of a given tree
+mapTree :: (a -> b) -> Tree a -> Tree b
+mapTree f (Leaf a) = Leaf (f a)
+mapTree f (Branch left right) = Branch (mapTree f left) (mapTree f right)
+
+-- foldTree folds given Tree to single value
+foldTree :: (a -> b) -> (b -> b -> b) -> Tree a -> b
+foldTree f _ (Leaf a) = f a
+foldTree f g (Branch left right) = g (foldTree f g left) (foldTree f g right)
+
+-- extendTree extends a given tree with new branches at its leafs
+extendTree :: (a -> Tree b) -> Tree a -> Tree b
+extendTree f (Leaf a) = f a
+extendTree f (Branch left right) = Branch (extendTree f left) (extendTree f right)
+
+
+-- testing
+ex1, ex2, ex3, ex4 :: Bool
+ex1 = flatTree (Branch (Leaf (Branch (Leaf 1) (Branch (Leaf 2) (Leaf 3)))) (Leaf (Leaf 4))) == Branch (Branch (Leaf 1) (Branch (Leaf 2) (Leaf 3))) (Leaf 4)
+ex2 = mapTree (*2) (Branch (Leaf (-2)) (Leaf 1)) == Branch (Leaf (-4)) (Leaf 2)
+ex3 = foldTree id max (Branch (Leaf 42) (Leaf 72)) == 72
+ex4 = extendTree Leaf (Branch (Branch (Leaf 3) (Leaf 2)) (Leaf 1)) == Branch (Branch (Leaf 3) (Leaf 2)) (Leaf 1)
+
+-- A3
+-- egh, keinen Bock mehr.
