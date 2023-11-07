@@ -1,5 +1,6 @@
-import Text.XHtml (base, background, name)
-import System.Posix (DL(Null))
+--import Text.XHtml (base, background, name)
+--import System.Posix (DL(Null))
+-- import Test.QuickCheck
 --import Text.XHtml (base)
 
 -- 1.1
@@ -90,19 +91,17 @@ ex4 = extendTree Leaf (Branch (Branch (Leaf 3) (Leaf 2)) (Leaf 1)) == Branch (Br
 -- could have left it as is, but in case they test with other datatypes and check
 -- for compiler error I didn't wanna risk it
 
-reverse :: [Int] -> [Int]
-reverse l = rev l []
+reverse1 :: [Int] -> [Int]
+reverse1 l = rev l []
     where
         rev []     acc = acc
         rev (x:xs) acc = rev xs (x:acc)
--- returned list must be exactly as long as the given list
 
 indexOf :: Int -> [Int] -> Maybe Int
 indexOf z zs = index 0 z zs
     where
         index _ _ []     = Nothing
         index i x (y:ys) = if x == y then Just i else index (i + 1) x ys
--- returned value can not be longer than the list itself -1 (index begins counting at 0)
 
 add :: Int -> [[Int]] -> [[Int]]
 add x [] = []
@@ -115,13 +114,12 @@ inits (x:xs) = [] : add x (inits xs)
 tails :: [Int] -> [[Int]]
 tails []     = [[]]
 tails (x:xs) = (x:xs) : tails xs
--- number of elements in the returned list must be the same as the length of the given list + 1 (since the empty list always exists in the result as well)
+-- fragment of testing
+-- tails (x:xs) = (xs) :tails xs
 
 insert :: Int -> [Int] -> [[Int]]
 insert x []   = [[x]]
 insert x (y:ys) = (x:y:ys) : add y (insert x ys)
--- number of elements in the returned list must be the same as the length of the given list + 1 (since the resulting list contains a list for each position of the inserted value)
-
 
 perms :: [Int] -> [[Int]]
 perms []     = [[]]
@@ -143,6 +141,30 @@ prop_NumberOfPermutations xs = fac (length xs) == length (perms xs)
             | otherwise = a * fac (a-1)
 
 -- inits
--- number of elements in the returned list must be the same as the length of the given list + 1 (since the empty list always exists in the result as well)
+-- number of elements in the returned list must be the same as the length of the given list + 1
+--(since the empty list always exists in the result as well)
 prop_LengthOfListPlusOne :: [Int] -> Bool
 prop_LengthOfListPlusOne xs = length (inits xs) == length xs + 1
+
+-- tails
+-- checks if the original list is an element of the output list
+prop_ContainsOriginal :: [Int] -> Bool
+prop_ContainsOriginal xs = xs `elem` (tails xs)
+
+-- indexOf
+-- element at returned index must be equal to element given
+prop_elemAtReturnedIndex :: Int -> [Int] -> Bool
+prop_elemAtReturnedIndex x xs =
+    case indexOf x xs of
+        Nothing -> True
+        Just y -> xs !! y == x
+
+-- reverse
+-- returned list must be exactly as long as the given list
+prop_revSameLength :: [Int] -> Bool
+prop_revSameLength xs = length (reverse1 xs) == length xs
+
+-- insert
+-- result list contains given element
+prop_elemInResult :: Int -> [Int] -> Bool
+prop_elemInResult x xs = all (elem x) (insert x xs)
