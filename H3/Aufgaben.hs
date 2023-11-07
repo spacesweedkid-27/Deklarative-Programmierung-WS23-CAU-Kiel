@@ -1,4 +1,5 @@
 import Text.XHtml (base, background, name)
+import System.Posix (DL(Null))
 --import Text.XHtml (base)
 
 -- 1.1
@@ -85,4 +86,63 @@ ex3 = foldTree id max (Branch (Leaf 42) (Leaf 72)) == 72
 ex4 = extendTree Leaf (Branch (Branch (Leaf 3) (Leaf 2)) (Leaf 1)) == Branch (Branch (Leaf 3) (Leaf 2)) (Leaf 1)
 
 -- A3
--- egh, keinen Bock mehr.
+-- modified functions from H2 for Int type
+-- could have left it as is, but in case they test with other datatypes and check
+-- for compiler error I didn't wanna risk it
+
+reverse :: [Int] -> [Int]
+reverse l = rev l []
+    where
+        rev []     acc = acc
+        rev (x:xs) acc = rev xs (x:acc)
+-- returned list must be exactly as long as the given list
+
+indexOf :: Int -> [Int] -> Maybe Int
+indexOf z zs = index 0 z zs
+    where
+        index _ _ []     = Nothing
+        index i x (y:ys) = if x == y then Just i else index (i + 1) x ys
+-- returned value can not be longer than the list itself -1 (index begins counting at 0)
+
+add :: Int -> [[Int]] -> [[Int]]
+add x [] = []
+add x (xs:xss) = (x:xs) : add x xss
+
+inits :: [Int] -> [[Int]]
+inits []     = [[]]
+inits (x:xs) = [] : add x (inits xs)
+
+tails :: [Int] -> [[Int]]
+tails []     = [[]]
+tails (x:xs) = (x:xs) : tails xs
+-- number of elements in the returned list must be the same as the length of the given list + 1 (since the empty list always exists in the result as well)
+
+insert :: Int -> [Int] -> [[Int]]
+insert x []   = [[x]]
+insert x (y:ys) = (x:y:ys) : add y (insert x ys)
+-- number of elements in the returned list must be the same as the length of the given list + 1 (since the resulting list contains a list for each position of the inserted value)
+
+
+perms :: [Int] -> [[Int]]
+perms []     = [[]]
+perms (x:xs) = permInsert [] (perms xs)
+    where
+        permInsert acc []       = acc
+        permInsert acc (ys:yss) = permInsert (acc ++ insert x ys) yss
+
+-- properties per function
+
+-- perms
+-- number of the elements in the returned list n must be the same as the length of the given list l with n = l!
+prop_NumberOfPermutations :: [Int] -> Bool
+prop_NumberOfPermutations xs = fac (length xs) == length (perms xs)
+    where
+        fac :: Int -> Int
+        fac a
+            | a < 2 = 1
+            | otherwise = a * fac (a-1)
+
+-- inits
+-- number of elements in the returned list must be the same as the length of the given list + 1 (since the empty list always exists in the result as well)
+prop_LengthOfListPlusOne :: [Int] -> Bool
+prop_LengthOfListPlusOne xs = length (inits xs) == length xs + 1
