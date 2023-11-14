@@ -1,7 +1,3 @@
---import Text.XHtml (base, background, name)
---import System.Posix (DL(Null))
--- import Test.QuickCheck
---import Text.XHtml (base)
 
 -- 1.1
 -- define data type JSON
@@ -168,3 +164,130 @@ prop_revSameLength xs = length (reverse1 xs) == length xs
 -- result list contains given element
 prop_elemInResult :: Int -> [Int] -> Bool
 prop_elemInResult x xs = all (elem x) (insert x xs)
+
+
+-- presence exercises
+
+-- texas fold'em
+
+-- higher order functions
+-- map (+) [1,2,3]
+
+{-
+:t flip
+flip :: (a -> b -> c) -> b -> a -> c
+
+foldr (+) 0 [1,2,3]
+>>> 6
+foldr (:) [] [1,2,3]
+>>> [1,2,3]
+foldr (\x xs -> x:x:xs) [] [1,2,3]
+>>> [1,1,2,2,3,3]
+let mymap f ys = foldr (\x xs -> f x : xs) [] ys
+mymap (+2) [1,2,3]
+
+fold ist eine Ersetzung der Konstruktoren durch gegebene Funktionen
+
+Händische Auswertung foldr Funktion
+foldr f e (1 : (2 : ( 3: [])))
+f 1 (foldr f e [2,3])
+f 1 (f 2 (foldr f e [3]))
+f 1 (f 2 (f 3 (foldr f e [])))
+f 1 (f 2 (f 3 e))
+1 `f` (2 `f` (3 `f` e))
+(1 : (2: ( 3: [])))
+
+Funktion muss assoziativ sein, damit es egal ist,
+ob man foldr oder foldl benutzt
+-}
+
+{-
+-- fold function definitions
+foldl :: (b -> a -> b) -> b -> [a] -> b
+foldl f z []     = z
+foldl f z (x:xs) = foldl f (f z x) xs
+
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr f z []     = z
+foldr f z (x:xs) = f x (foldr f z xs)
+-}
+
+-- maximum function returns largest element from a list
+maximum1 :: [Int] -> Int
+maximum1 []     = 0
+maximum1 (y:xs) = foldr (\x acc -> max x acc) y xs
+
+-- fold-Funktion für beliebige Typen erstellen:
+-- Bsp. Maybe
+-- data Maybe a = Nothing | Just a
+
+-- Kochrezept:
+
+-- 1. Typen der Konstruktoren bestimmen
+-- Nothing :: Maybe a
+-- Just    :: a -> Maybe a
+-- unsicher? :t type >>> Typ wird ausgegeben
+
+-- 2. Neue Typvariable für das Ergebnis einführen
+-- b
+
+-- 3. Ersetzen alle Vorkommen des zu faltenden Typs in den
+-- Konstruktor-Typen aus 2.
+
+-- für Nothing: b
+-- für Just: a -> b
+
+-- 4. Zusammenbauen des Typs der Faltungsfunktion:
+    -- für jeden Konstruktor ein Argument des Typs aus 3. (hier b und (a -> b))
+    -- ein Argument für den zu faltenden Wert (hier: Maybe a)
+    -- die Ergebnisvariable aus 2. (hier b)
+
+--       Nothing    Just
+foldMaybe :: b -> (a -> b) -> Maybe a -> b
+foldMaybe    z     f          Nothing  = z
+foldMaybe    z     f          (Just x) = f x
+
+-- data Either a b = Left a | Right b
+
+-- Left :: a -> b
+-- Right :: b -> c
+
+foldEither :: (a -> c) -> (b -> c) -> Either a b -> c
+foldEither left right (Left x)  = left x
+foldEither left right (Right y) = right y
+
+data Tree2 a b = Empty
+              | Leaf2 a -- kann gar nicht verzweigen
+              | Node2 b [Tree2 a b] -- Liste von Knoten, kann so viel verzweigen, wie er lustig ist
+    deriving Show
+
+-- Empty :: Tree2 a b
+-- Leaf :: a -> Tree2 a b
+-- Node :: b -> [Tree2 a b] -> Tree2 a b
+
+-- Neue Typvariable c
+
+-- Empty :: c
+-- Leaf2 :: a -> c
+-- Node2 :: b -> [c] -> c
+
+foldTree2 :: c -> (a -> c) -> (b -> [c] -> c) -> Tree2 a b -> c
+foldTree2  empty leaf node t =
+    case t of
+        Empty      -> empty
+        Leaf2 x    -> leaf x
+        Node2 b ts -> node b (map (foldTree2 empty leaf node) ts)
+
+t :: Tree Int Bool
+t = Node True [Leaf 42, Node False [Empty, Leaf 8]]
+
+-- sums up those leafs that are under nodes that are true
+sumIfTrue :: Tree Int Bool -> Int
+sumIfTrue t = foldTree empty leaf node t
+    where
+        empty     = 0
+        leaf x    = x
+        node b ts = if b then sum ts else 0
+
+-- >>> sumIfTrue t
+-- 42
