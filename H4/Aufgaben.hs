@@ -39,3 +39,21 @@ listToSet = \list -> (\num -> elem num list)
 setToList :: IntegerSet -> [Integer]
 setToList = \set -> filter set [0..]
 -- Als Beispiel lässt sich setToList (complement empty) annähernd berechnen.
+
+--3.1)
+-- don't copy
+data Rose a = Rose a [Rose a]
+  deriving Show
+
+instance (Eq a) => Eq (Rose a) where
+    -- Adding type signatures suddently breaks it. Huh?
+    -- (==) :: Eq a => Rose a -> Rose a -> Bool
+    (Rose val1 rest1) == (Rose val2 rest2)
+        | length rest1 /= length rest2 || val1 /= val2 = False
+        | not (null rest1) = rest1 == rest2 -- this looks cursed
+        | otherwise = True
+
+
+
+example :: Rose Integer
+example = Rose 4 [Rose 5 [Rose 1 [], Rose 2 [Rose 7 [], Rose 8 []], Rose 3 []], Rose 6 []]
