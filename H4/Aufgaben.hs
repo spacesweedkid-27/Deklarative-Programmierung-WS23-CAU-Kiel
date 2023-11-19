@@ -53,7 +53,45 @@ instance (Eq a) => Eq (Rose a) where
         | not (null rest1) = rest1 == rest2 -- this looks cursed
         | otherwise = True
 
+-- create instance to make trees comparable, if the datatype a
+instance Ord a => Ord (Rose a) where
+    compare (Rose x xs) (Rose y ys)
+        | compare x y == EQ = compare xs ys
+        | otherwise         = compare x y
 
+-- A3.2
+
+class Pretty a where
+  pretty :: a -> String
+  preTree :: a -> String -> String
+
+instance Pretty a => Pretty (Rose a) where
+  preTree :: Rose a -> String -> String
+  preTree (Rose x []) ind = ind ++ "+-- " ++ pretty x ++ "\n"
+  preTree (Rose x children) ind =
+      ind ++ "+-- " ++ pretty x ++ "\n" ++
+      concatMap (preTree' (ind ++ "| ")) children
+    where
+      preTree' :: String -> Rose a -> String
+      preTree' ind r = preTree r ind
+  
+  pretty :: a -> String
+  pretty = show
+{-
+instance Pretty a => Pretty (Rose a) where
+  -- for first rose print value as String
+  -- for each child print "+--" and then the value as a string
+  -- for each indentation after the first print "|" instead
+  preTree :: String -> a -> String
+  preTree ind (Rose x []) = ind ++ "+--" ++ pretty x ++ "\n"
+  preTree (Rose x children) ind =
+      ind ++ "+-- " ++ pretty x ++ "\n" ++ concatMap (preTree' "| " ind) children
+    where
+      preTree' :: String -> Rose a -> String
+      preTree' ind r = preTree r ind
+    
+  -- pretty tree = pretty tree ""
+  -}
 
 example :: Rose Integer
 example = Rose 4 [Rose 5 [Rose 1 [], Rose 2 [Rose 7 [], Rose 8 []], Rose 3 []], Rose 6 []]
