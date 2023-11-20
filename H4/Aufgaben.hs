@@ -66,16 +66,16 @@ class Pretty a where
 
 instance (Pretty a, Show a) => Pretty (Rose a) where
   -- end case
-  pretty (Rose val [])         = (show val)
-  -- call yourself and add +-- or | each time
-  pretty (Rose val children) = ind ("+-- " ++ (show val) (Rose children []))
-      where
-        ind :: String -> Rose a -> String
-        ind str Rose child = "|  " ++ str ++ pretty (Rose child)
-
+  pretty (Rose value rest) = pretty value ++ (recu 0 rest)
+    where
+      recu :: Pretty a => Int -> [Rose a] -> String
+      recu depth [] = ""
+      recu depth ((Rose value2 subtrees) : next) = "\n" ++ (concat (replicate depth "|  ")) ++ "+-- " ++ (pretty value2) ++ (recu (depth + 1) subtrees) ++ (recu depth next)
 
 instance Pretty Integer where
     pretty = show
 
+
+-- don't copy
 example :: Rose Integer
 example = Rose 4 [Rose 5 [Rose 1 [], Rose 2 [Rose 7 [], Rose 8 []], Rose 3 []], Rose 6 []]
