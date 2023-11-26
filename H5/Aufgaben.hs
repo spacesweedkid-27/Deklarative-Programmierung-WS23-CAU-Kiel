@@ -124,6 +124,26 @@ avgen n1 n2 n3 -- min((avprod n1+1 n2 n3), min ((avprod n1 n2+1 n3), (avprod n1 
     -- gleichheit für n1 und n3, mit avprod2 3 weitermachen
     | avprod n1 n2 n3 == avprod n1 n2 n3 = avprod n1 n2 n3 : avgen n1 n2 (n3+1)
 
+
+-- A2 ATTEMPT HENRI (lol)
+div2 :: Integer -> Integer -> Integer
+div2 a b
+    | mod a b == 0 = div a b
+    | otherwise = 0
+
+avalancheSet :: Integer -> Bool
+avalancheSet 0 = False
+avalancheSet 1 = True
+avalancheSet n
+    | avalancheSet (div2 n 5) = True
+    | avalancheSet (div2 n 7) = True
+    | avalancheSet (div2 n 11) = True
+    | otherwise = False
+
+-- RENAME THIS
+avalanche3 :: [Integer]
+avalanche3 = filter avalancheSet [0..]
+
 -- A3
 
 -- untilizing monad in this case, because why not
