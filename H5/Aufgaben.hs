@@ -1,5 +1,5 @@
 import Data.Ratio
-import Data.List
+--import Data.List
 
 -- A1.1
 
