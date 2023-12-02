@@ -1,5 +1,7 @@
 import Data.Char (isAlpha, toLower)
 
+-- may have issues displaying in a shell, but the duplication error has been fixed.
+
 -- "converts" string to star version while not hiding known chars
 filterSecretString :: String -> String -> String
 filterSecretString [] _ = []    -- induction start

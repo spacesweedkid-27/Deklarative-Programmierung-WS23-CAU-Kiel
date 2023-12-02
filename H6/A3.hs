@@ -24,6 +24,5 @@ lookup key map = listToMaybe [snd e | e <- map, fst e == key]   -- snd and fst t
 replicate :: Int -> a -> [a]
 replicate num elem = [elem | _ <- [1 .. num]]   -- this feels illegal
 
-
 filter :: (a -> Bool) -> [a] -> [a]
 filter cond list = [elem | elem <- list, cond elem] -- map but the other way around and easier
