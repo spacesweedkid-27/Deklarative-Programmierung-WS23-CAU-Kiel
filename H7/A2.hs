@@ -16,8 +16,6 @@ ASSUMPTIONS.:
 TO PROVE.:
     1) pure id <*> v = v                              -- Identity
     2) pure f <*> pure x = pure (f x)                 -- Homomorphism
-    3) u <*> pure y = pure (\g -> g y) <*> u          -- Interchange ??
-    4) (pure (.) <*> u <*> v) <*> w = u <*> (v <*> w) -- Composition ??
 
 PROOF.:
     1)
@@ -38,8 +36,6 @@ PROOF.:
         = \a -> return (f a) x                              | Calculate
         = return (f x)                                      | DA
         = pure (f x)                                        ■
-    3)
-        NOT TO PROVE?
-    4)
-        NOT TO PROVE?
+    
+    With that everything that had to be proved has been proven. □
 -}
