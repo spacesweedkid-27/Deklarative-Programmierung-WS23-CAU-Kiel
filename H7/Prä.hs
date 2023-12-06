@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 data Error a = Failure String | Value a
     deriving (Show, Eq)
 
