@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 data Error a = Failure String | Value a
     deriving (Show, Eq)
 
@@ -18,3 +20,11 @@ instance Applicative Error where
     (<*>) _ (Failure input) = Failure input     -- stop if not
     (<*>) (Failure txt) _ = Failure txt         -- again
 
+-- holds left identity, because return = pure, which enables return x >>= f = pure x >>= f = Value x >>= f = f x
+-- holds right identity, because errA >>= return = errA >>= Value = (Value val | Failure str) >>= Value = (Value val | Failure str)
+-- holds Associativity, similar proof like right identity
+instance Monad Error where
+    return = pure
+
+    (>>=) (Value input) func = func input   -- pass if ok
+    (>>=) (Failure txt) func = Failure txt  -- if not then don't
