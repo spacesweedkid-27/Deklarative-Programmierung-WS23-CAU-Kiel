@@ -45,6 +45,7 @@ mutter(Kind,Mutter) :- kind(Kind,_,Mutter), geschlecht(Mutter,w).
 elternteil(Kind,Elternteil) :- kind(Kind,Elternteil,_), geschlecht(Elternteil,d).
 elternteil(Kind,Elternteil) :- kind(Kind,_,Elternteil), geschlecht(Elternteil,d).
 
+% helper for A1.4, for shorter code
 eltern(Kind,Eltern) :- kind(Kind,Eltern,_).
 eltern(Kind,Eltern) :- kind(Kind,_,Eltern).
 
