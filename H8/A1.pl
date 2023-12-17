@@ -1,5 +1,3 @@
-%working_directory(CWD,'/Users/nikepulow/personal/Latex/gitclones/Deklarative-Programmierung-WS23-CAU-Kiel/H8').
-
 % Definition der Verheiratet-Relation:
 verheiratet(christine, heinz).
 verheiratet(hubert,    fritz).

@@ -1,4 +1,3 @@
-%working_directory(CWD,'/Users/nikepulow/personal/Latex/gitclones/Deklarative-Programmierung-WS23-CAU-Kiel/H8').
 % H8.2
 
 person(skywalker).
