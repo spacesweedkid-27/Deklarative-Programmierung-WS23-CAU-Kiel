@@ -3,36 +3,27 @@
 
 person(skywalker).
 person(solo).
-person(organa).
 person(mothma).
+person(organa).
 
-skywalker(Role).
-solo(Role).
-organa(Role).
-mothma(Role).
+role(chairman).
+role(traesurer).
+role(secretary).
 
-% roles
-roles(secretary).
-roles(traesurer).
-roles(chairman).
-roles(boardmember).
+% solo und mothma wollen nicht gemeinsam in den Vorstand
+cond1(C,T,S) :- (C \= solo, T \= solo, S \= solo) ; (C \= mothma, T \= mothma, S \= mothma). % passt
 
-%dislikes(solo,boardmember(mothma)).
-%dislikes(skywalker,traesurer(solo)).
-%dislikes(mothma,secretary(organa)).
-%likes(organa,boardmember(skywalker)).
-%likes(solo,chairman(organa)).
+% solo nur im Vorstand, wenn Organa Vorsitzende
+cond2(C,T,S) :- (T = solo, C = organa) ; (S = solo , C = organa) ; (T \= solo, S \= solo, C \= solo). % passt
 
-%skywalker(roles(secretary)) :- na
-%skywalker(roles(traesurer)) :- na
-%skywalker(roles(chairman)) :- na
-organa(roles(_)) :- skywalker(roles(_)).
-organa(roles(secretary)) :- \+ mothma(roles(_)).
-organa(roles(chairman)) :- solo(roles(_)).
-%organa(roles(traesurer)) :- na
-solo(roles(_)) :- \+ mothma(roles(_)), organa(roles(chairman)).
-solo(roles(traesurer)) :- skywalker(roles(_)).
-mothma(roles(_)) :- \+ solo(roles(_)).
-mothma(roles(_)) :- \+ organa(roles(secretary)).
+% Organa nur im Vorstand, wenn Skywalker im Vorstand
+cond3(C,T,S) :- ((C = organa, T = organa, S = organa) , (C = skywalker, T = skywalker, S = skywalker)) ; (C \= organa, T \= organa, S \= organa). % nicht notwendig
 
-board(Person,Role) :- 
+% Skywalker nicht im Vorstand, wenn Solo Kasse
+cond4(C,T,S) :- ((T = solo), (C \= skywalker, T \= skywalker, S \= skywalker)) ; (T \= solo). % passt
+
+% Mothma nicht im Vorstand, wenn Organa Sekretär
+cond5(C,T,S) :- ((S = organa), (C \= mothma, T \= mothma, S \= mothma)) ; (S \= organa). % passt
+
+board(C,T,S) :- person(C), person(T), person(S), person(skywalker), person(solo), person(mothma), person(organa),
+                C \= T, C \= S, T \= S, (cond2(C,T,S)), (cond1(C,T,S)), (cond4(C,T,S)), (cond5(C,T,S)).
