@@ -1,7 +1,9 @@
 module Vars
   (
+    -- A1)
     Vars (allVars),
-    -- freshVars,
+    -- A2)
+    freshVars,
     testVars
   )
 where
@@ -27,6 +29,16 @@ where
 
     instance Vars Goal where
       allVars (Goal lst) = nub (concatMap allVars lst)  -- same ......
+
+    
+    -- made this a while ago, I knew I could use it again :)
+    tuples :: String -> [String]
+    tuples alphabet = "" : [ c : s | s <- "" : tuples alphabet, c <- alphabet]
+
+    -- get all tuples from the numbers and append a letter left
+    freshVars :: [VarName]
+    freshVars = [VarName (c : s) | s <- tuples "0123456789", c <- "ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
+
 
     testVars :: IO Bool
     testVars = do
