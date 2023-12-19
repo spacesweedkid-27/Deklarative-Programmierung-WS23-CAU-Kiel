@@ -19,8 +19,8 @@ where
       allVars input = removeDuplicates (allVars' input)   -- somehow does not remove duplicates
         where
           allVars' :: Term -> [VarName]
-          allVars' (Comb _ terms) = concatMap allVars' terms  -- used concat for more ellegant implementation
-          allVars' (Var varName) = [varName]  -- stays the same
+          allVars' (Comb _ terms) = concatMap allVars' terms  -- used concat for more elegant implementation
+          allVars' (Var varName) = [varName]                  -- stays the same
 
     instance Vars Rule where
       allVars (Rule term restTerms) = allVars term ++ concatMap allVars restTerms
