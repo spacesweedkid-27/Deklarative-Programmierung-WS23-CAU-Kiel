@@ -19,9 +19,8 @@ where
       allVars input = removeDuplicates (allVars' input)   -- somehow does not remove duplicates
         where
           allVars' :: Term -> [VarName]
-          allVars' (Comb str (nextTerm : restTerm)) = allVars' nextTerm ++ allVars' (Comb str restTerm)  -- case Comb constructor, induction step, search for more VarNames and ignore the CombName
-          allVars' (Var (VarName varname)) = [VarName varname] -- case Var constructor, induction start, just append this varname
-          allVars' (Comb _ []) = []  -- case Comb constructor 2 in case the [Term] is empty, then just append empty list, - also induction start.
+          allVars' (Comb _ terms) = concatMap allVars' terms  -- used concat for more ellegant implementation
+          allVars' (Var varName) = [varName]  -- stays the same
 
     instance Vars Rule where
       allVars (Rule term restTerms) = allVars term ++ concatMap allVars restTerms
