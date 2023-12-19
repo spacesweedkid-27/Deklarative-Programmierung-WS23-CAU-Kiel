@@ -1,0 +1,2 @@
+# don't upload builds
+/deklprog-project/dist-newstyle/build/*
