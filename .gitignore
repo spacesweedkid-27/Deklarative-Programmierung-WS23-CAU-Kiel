@@ -1,2 +1,2 @@
-# don't upload builds
-/deklprog-project/dist-newstyle/build/*
+# don't upload builds, cache or other bad stuff
+/deklprog-project/dist-newstyle/*
