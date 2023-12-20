@@ -8,7 +8,26 @@ module Vars
   )
 where
     import Base.Type
-    import Data.List (nub)
+    
+
+
+    -- this is the implementation of nub used in Data.List
+    -- used this to check for duplicates
+    -- because of the no imports rule, I reimplemented it.
+    nub :: (Ord a) => [a] -> [a]
+    nub = nubBy (==)
+      where
+        -- stolen from HBC
+        nubBy :: (Ord a) => (a -> a -> Bool) -> [a] -> [a]  -- nubBy operator
+        nubBy eq l = nubBy' l []  -- start with empty list.
+          where
+            nubBy' [] _         = []
+            nubBy' (y:ys) xs
+              | elem_by eq y xs = nubBy' ys xs              -- if the elem condition is true then don't append.
+              | otherwise       = y : nubBy' ys (y:xs)      -- if the elem condition is false then append.
+              where
+                elem_by _  _ []            =  False                             -- the empty list has no elements so there can't be a true condition (inductive start)
+                elem_by eq1 y1 (x:xs1)     =  x `eq1` y1 || elem_by eq1 y1 xs1  -- check if x and y1 have a true condition named eq1, which for example could be (==), and check the rest of the list.
     
     class Vars a where
       -- Calculate all Variablenames from a Type
