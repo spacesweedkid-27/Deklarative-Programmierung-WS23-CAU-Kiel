@@ -14,6 +14,7 @@ module Subst
 where
 
 -- Hand in after this part... maybe... I don't know...
+-- at least everything before this should not be handed in...
 
 import Base.Type
 import Data.List (intercalate, nub, sort)
