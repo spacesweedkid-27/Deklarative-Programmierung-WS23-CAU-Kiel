@@ -2,29 +2,66 @@
 
 module Subst
   ( Subst, -- don't export the constructor of the data type!
-    -- domain,
-    -- empty,
-    -- single,
-    -- compose,
-    -- apply,
+    domain,
+    empty,
+    single,
+    isEmpty,  -- sussy of them to not add this
+    compose,
+    apply,
     -- restrictTo,
     testSubst,
   )
 where
 
+-- Hand in after this part... maybe... I don't know...
+
 import Base.Type
 import Data.List (intercalate, nub, sort)
 import Test.QuickCheck
+import Vars
 
 -- Data type for substitutions
 data Subst = Subst [(VarName, Term)]
   deriving (Show)
+
+
+domain :: Subst -> [VarName]
+domain (Subst ((name1, Var name2) : rest))        -- case that we have a variable and some rest
+  | name1 /= name2 = name1 : domain (Subst rest)  -- name is not the same?, then add it and append the rest
+  | otherwise      = domain (Subst rest)          -- else just append the rest
+domain (Subst ((name1, Comb _ terms) : rest)) = name1 : domain (Subst rest) -- even if terms is just [name1] then still we accept name1!
+domain (Subst []) = []  -- case for the last rest
+
+empty :: Subst
+empty = Subst []  -- easy
+
+single :: VarName -> Term -> Subst
+single name term = Subst [(name, term)]   -- still easy
+
+isEmpty :: Subst -> Bool
+isEmpty subst = null (domain subst) -- no curry :(, and also easy
+
+apply :: Subst -> Term -> Term
+apply (Subst ((name1, term) : rest)) (Var name2)
+  | name1 == name2 = term                           -- found it? then apply
+  | otherwise      = apply (Subst rest) (Var name2) -- if not, got play fetch
+apply subst (Comb combname terms) = Comb combname (map (apply subst) terms)  -- huh? it can be so simple...
+apply (Subst []) name = name -- if the varname has not been found, then just do nothing
+
+compose :: Subst -> Subst -> Subst
+compose (Subst list1) (Subst list2) =
+  Subst
+  ([(name, apply (Subst list1) term) | (name, term) <- list2, apply (Subst list1) term /= Var name]  -- left part of the definition
+  ++ 
+  [pair | pair <- list1, fst pair `notElem` domain (Subst list2)]) -- right part of the definition
+  -- I don't think we have to filter duplicates...
 
 -- Generator for substitutions
 instance Arbitrary Subst where
   -- We use the `suchThat` combinator to filter out substitutions that are not valid,
   -- i.e. whose domain contains the same variable more than once.
   arbitrary = Subst <$> (arbitrary `suchThat` ((\vts -> length vts == length (nub vts)) . map fst))
+
 
 -- Properties
 
