@@ -1,20 +1,17 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Subst
-  ( Subst, -- don't export the constructor of the data type!
+  ( Subst, -- don't export the constructor of the data type!?
     domain,
     empty,
     single,
-    isEmpty,  -- sussy of them to not add this
+    isEmpty,  -- well we need this...
     compose,
     apply,
-    -- restrictTo,
+    -- restrictTo, -- what is this?
     testSubst,
   )
 where
-
--- Hand in after this part... maybe... I don't know...
--- at least everything before this should not be handed in...
 
 import Base.Type
 import Data.List (intercalate, nub, sort)
@@ -63,6 +60,17 @@ instance Arbitrary Subst where
   -- i.e. whose domain contains the same variable more than once.
   arbitrary = Subst <$> (arbitrary `suchThat` ((\vts -> length vts == length (nub vts)) . map fst))
 
+-- Pretty printing of substitutions
+instance Pretty Subst where
+  pretty (Subst vts) = '{' : intercalate ", " (map prettyVt vts) ++ "}"
+    where
+      prettyVt (x, t) = unwords [pretty (Var x), "->", pretty t]
+
+-- All variables occuring in substitutions
+instance Vars Subst where
+  allVars (Subst vts) = nub (vs ++ concatMap allVars ts)
+    where
+      (vs, ts) = unzip vts
 
 -- Properties
 
