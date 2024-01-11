@@ -11,10 +11,17 @@ app([X|Xs], Ys, [X|Zs]) :- app(Xs, Ys, Zs). % Zs is Xs appended to Ys
 
 % 2.
 % The conclusion seen in the comments about the cut operator suggest that removing it will not make a difference.
+% for reference, this is how the cut operator is discribed in the script:
+% In Prolog kann ! anstelle von Literalen im Regelrumpf stehen:
+% p :- q, !, r.
+% Operational bedeutet dies: Wird diese Regel zum Beweis von p benutzt, dann gilt:
+% 1. Falls q nicht beweisbar ist: wähle nächste Regel für p.
+% 2. Falls q beweisbar ist: p ist nur beweisbar, falls r beweisbar ist. Mit anderen Worten,
+% es wird kein Alternativbeweis für q und keine andere Regel für p ausprobiert.
+%
 % Now lets look at the other change:
 
 rev2([]    , []) .   % reverse [] is []
 rev2([X|Xs], Zs) :- rev2(Xs, Ys),       % Search for Ys so that Xs and Ys are reverse to each other
-                                        % This will result in cutting off X until
-                    app(Ys, [X], Zs).   % 
-                                        %
+                                        % This will result in cutting off X until Xs is empty, resulting in Ys = []
+                    app(Ys, [X], Zs).   % Now we append the cut off X's at Ys until we have the full list reversed.
