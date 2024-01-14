@@ -35,6 +35,8 @@ empty :: Subst
 empty = Subst []  -- easy
 
 single :: VarName -> Term -> Subst
+single name0 (Var name1)
+  | name0 == name1 = empty  -- check for bad substitution
 single name term = Subst [(name, term)]   -- still easy
 
 isEmpty :: Subst -> Bool
