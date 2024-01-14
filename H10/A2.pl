@@ -16,5 +16,15 @@ remove(X,[Y|Xs],[Y|Ys])     :- X \= Y, remove(X,Xs,Ys). % Ist X nicht das in bei
                                                         % diese gleich sind
 
 % nub(L,R) ist erfüllbar, wenn R der Liste L ohne Duplikate entspricht
-nub([],[]).                 % ist wahr, wenn beide Listen leer sind
-nub([X|Xs],Ys) :- remove(X,Xs,Yss), nub(Yss,Ys). % no, that's not it
+% Ich bin mir nicht sicher, ob ich die Aufgabenstellung hier richtig verstanden
+% habe - meine Interpretation ist die Forderung, dass beide Listen R und L gleich sein
+% müssen und keine Duplikate enthalten dürfen. Also anders als bei Remove werden auch
+% keine Werte gestrichen, sondern direkt zu falsch ausgewertet, sobald in einer der Listen
+% ein Duplikat gefunden wurde.
+nub([],[]).                                             % ist wahr, wenn beide Listen leer sind
+nub([Y|Xs],[Y|Ys]) :- \+ member(Y,Xs), nub(Xs,Ys).      % das erste Element beider Listen muss gleich sein und
+                                                        % es wird geprüft, ob die Listen Duplikate enthalten,
+                                                        % nach dem gleichen Schema wie bereits bei nodup.
+
+% nub([1,2],[1,2]) >>> true
+% nub([1,1],[1,1]) >>> false
