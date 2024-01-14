@@ -17,6 +17,7 @@ import Base.Type
 import Data.List (intercalate, nub, sort)
 import Test.QuickCheck
 import Vars
+import Pretty
 
 -- Data type for substitutions
 data Subst = Subst [(VarName, Term)]
