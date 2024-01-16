@@ -1,27 +1,10 @@
-% isPeano(o).
-% isPeano(s(N)) :- isPeano(N).
+% code from the script to line 7
 
-% succ(X, s(X)).
-% pred(s(X), X).
+add(o, Y, Y).                       % 0 is the neutral element of addition
+add(s(X), Y, s(Z)) :- add(X,Y,Z).   % (a+1)+b = (c+1) <==> a+b = c
 
-add(o, Y, Y).
-add(s(X), Y, s(Z)) :- add(X,Y,Z).
-
-% sub(X, Y, Z) :- add(Y, Z, X). % unused
-
-mult(o, _, o).
-mult(s(N), M, K) :- mult(N,M,O), add(O,M,K).
-
-/* unused
-leq(o, _).
-leq(s(N), s(M)) :- leq(N,M).
-
-geq(_, o).
-geq(s(N), s(M)) :- leq(N,M).
-
-eq(o, o).
-eq(s(N), s(M)) :- eq(N,M).
-*/
+mult(o, _, o).                                  % 0 is the "killing" element of multiplication
+mult(s(N), M, K) :- mult(N,M,O), add(O,M,K).    % add all sub-multiplications together.
 
 horseman(K, ResMult, K, o) :- mult(s(s(s(s(o)))), K, ResMult).   % if there are K heads and 4*K legs, we have K horses, inductive start
 horseman(K, ResMult, o, K) :- mult(s(s(o)), K, ResMult).         % if there are K heads and 2*K legs, we have K humans, inductive start
