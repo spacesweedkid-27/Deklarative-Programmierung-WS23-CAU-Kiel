@@ -1,4 +1,4 @@
-mobile(fisch(A), A).
+mobile(fisch(A), A) :- A >= 0.
 mobile(bruecke(A, B), Res) :- mobile(A, ResA),
                               mobile(B, ResB),
                               Res is ResA + ResB + 1.
@@ -23,3 +23,4 @@ mobile(bruecke(A, B), Res) :- mobile(A, ResA),
 % Prolog will fail, since it can't solve the equation "3 = ResA + ResB + 1" with is.
 % If one would use peano-numbers, it would be possible to find solutions,
 % since with them, all solutions for add(A, B, s(o(o))) (remember 3-1 = 2 ^= s(o(o))) would be found.
+% you could also implement this with clpq, because it allows solving for uninstanciated variables.
