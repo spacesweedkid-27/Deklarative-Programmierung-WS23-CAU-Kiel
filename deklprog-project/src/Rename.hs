@@ -1,18 +1,30 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use newtype instead of data" #-}
 
 module Rename
-  ( testRename
-  , --rename,
+  ( rename,
+    testRename,
   )
 where
 
-import Data.List (intersect, nub)
-
+import Base.Type
+import Data.List
+import Subst
 import Test.QuickCheck
+import Vars
+
+-- Rename a rule with fresh variables (occur neither in the rule itself nor the blocklist)
+rename :: [VarName] -> Rule -> Rule
+rename blocklist r@(Rule l rs) = Rule (apply s l) (map (apply s) rs)
+  where
+    vars = allVars r
+    vars' = [x | x <- freshVars, x `notElem` blocklist ++ vars]
+    substs = zipWith (\ v v' -> single v (Var v')) vars vars'
+    s = foldr compose empty substs
 
 -- Properties
-
-{- Uncomment this to test the properties when all required functions are implemented
 
 -- All variables in the renamed rule are fresh
 prop_1 :: [VarName] -> Rule -> Bool
@@ -26,8 +38,7 @@ prop_2 xs r = null (allVars (rename xs r) `intersect` xs)
 prop_3 :: [VarName] -> Rule -> Bool
 prop_3 xs r = length (nub (allVars (rename xs r))) == length (nub (allVars r))
 
--}
+return []
 
--- Run all tests
-testRename :: IO ()
-testRename = undefined
+testRename :: IO Bool
+testRename = $(quickCheckAll)
